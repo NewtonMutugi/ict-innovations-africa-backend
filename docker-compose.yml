@@ -1,0 +1,51 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - /data/postgres:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - web
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $POSTGRES_USER']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  online-payment:
+    depends_on:
+      - postgres
+    container_name: online-payment
+    build: .
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - '8000:8000'
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - web
+    restart: on-failure
+    env_file:
+      - .env
+
+  pgadmin:
+    container_name: pgadmin
+    links:
+      - postgres
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+    volumes:
+      - /data/pgadmin:/var/lib/pgadmin
+    env_file:
+      - .env
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
