@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, HTTPException, Request, Depends, status
 from sqlalchemy.orm import Session
 from database.database import SessionLocal
 from database.schema import Payment
@@ -16,7 +16,7 @@ def get_db():
 
 
 @router.post("/initialize")
-async def initialize_payment(request: Request):
+async def initialize_payment(request: Request, db: Session = Depends(get_db)):
     body = await request.json()
     amount = body.get('amount')
     email = body.get('email')

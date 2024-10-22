@@ -1,8 +1,7 @@
 from sqlalchemy import Column, String, Float, DateTime, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-
-Base = declarative_base()
+from database.database import Base
+from database.database import engine
 
 
 class Payment(Base):
@@ -14,5 +13,8 @@ class Payment(Base):
     amount = Column(Float, nullable=False)
     paymentReference = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now,
-                        onupdate=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+# Create tables if they do not exist
+Base.metadata.create_all(engine)

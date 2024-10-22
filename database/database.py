@@ -1,11 +1,10 @@
+import time
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import time
 from settings import settings
 
-DATABASE_URL = f"postgresql://{settings.POSTGRES_USER}:{
-    settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}/{settings.POSTGRES_DB}"
+DATABASE_URL = settings.POSTGRES_URL
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -26,23 +25,16 @@ def connect_with_retry():
             connection = engine.connect()
             print('Database connection established successfully.')
             return connection
-        except Exception as err:  # noqa: F841
-            print(f"Database connection failed. Retrying in {
-                  retry_options['min_timeout']} seconds...")
+        except Exception as err:
+            print(f"DB connection failed: {err}. Retrying in {retry_options['min_timeout']} s")
             time.sleep(retry_options['min_timeout'])
             retry_options['min_timeout'] = min(
-                retry_options['min_timeout'] * retry_options['factor'], retry_options['max_timeout'])
+                retry_options['min_timeout'] *
+                retry_options['factor'], retry_options['max_timeout']
+            )
 
     raise Exception(
         'Unable to connect to the database after multiple attempts.')
 
 
 connection = connect_with_retry()
-
-
-def initialize_connection():
-    global connection
-    connection = connect_with_retry()
-
-
-initialize_connection()

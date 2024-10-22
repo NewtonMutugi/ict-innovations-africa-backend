@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     APPLICATION_PORT: str
     PAYSTACK_SECRET_KEY: str
     PAYSTACK_BASE_URL: str
+    POSTGRES_URL: str
 
     class Config:
         env_file = './.env'
