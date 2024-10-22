@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Request, HTTPException,status
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from settings import settings
 from routes import router
 import uvicorn
+from settings import settings
 
 app = FastAPI()
 
@@ -12,12 +11,10 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.add_middleware(HTTPSRedirectMiddleware)
 
 
 @app.get("/")
@@ -33,7 +30,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"message": exc.detail},
     )
-
 
 @app.exception_handler(404)
 async def not_found_exception_handler(request: Request, exc: HTTPException):
