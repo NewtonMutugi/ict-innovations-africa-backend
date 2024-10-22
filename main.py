@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 import uvicorn
 from settings import settings
+from database.database import Base
+from database.database import engine
 
 app = FastAPI()
 
@@ -15,6 +17,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create tables if they do not exist
+Base.metadata.create_all(engine)
 
 
 @app.get("/")
@@ -30,6 +35,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"message": exc.detail},
     )
+
 
 @app.exception_handler(404)
 async def not_found_exception_handler(request: Request, exc: HTTPException):
