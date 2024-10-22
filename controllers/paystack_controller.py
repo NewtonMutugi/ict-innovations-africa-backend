@@ -1,10 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, status
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from database.database import SessionLocal
 from database.schema import Payment
 from api.paystack_api import paystack_api
-from psycopg2.errors import UniqueViolation
 
 router = APIRouter()
 
