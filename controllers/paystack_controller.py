@@ -102,22 +102,22 @@ async def verify_payment(reference: str, db: Session = Depends(get_db)):
                                 detail="Payment reference already exists")
 
         # Create a new payment record
-        payment_record = Payment(
-            amount=amount,
-            email=email,
-            name=name,
-            paymentReference=payment_reference,
-            phone=metadata.get('phone'),
-        )
+        # payment_record = Payment(
+        #     amount=amount,
+        #     email=email,
+        #     name=name,
+        #     paymentReference=payment_reference,
+        #     phone=metadata.get('phone'),
+        # )
 
-        db.add(payment_record)
-        db.commit()
-        db.refresh(payment_record)
+        # db.add(payment_record)
+        # db.commit()
+        # db.refresh(payment_record)
 
-        return {
-            "message": "Payment verified",
-            "data": payment_record
-        }
+        # return {
+        #     "message": "Payment verified",
+        #     "data": payment_record
+        # }
 
     except Exception as e:
         print(f"Error verifying payment: {e}")
