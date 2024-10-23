@@ -127,14 +127,17 @@ async def verify_payment(reference: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to verify payment")
 
 
-@router.post("/callback")
-async def payment_callback(request: Request, db: Session = Depends(get_db)):
+@router.get("/callback")
+async def payment_callback(reference: str, db: Session = Depends(get_db)):
+    if not reference:
+        raise HTTPException(
+            status_code=400, detail="Missing transaction reference")
     try:
-        callback_data = await request.json()
-        reference = callback_data.get("reference")
-        status = callback_data.get("status")
+        # callback_data = await request.json()
+        # reference = callback_data.get("reference")
+        # status = callback_data.get("status")
 
-        if not reference or not status:
+        if not reference:
             raise HTTPException(
                 status_code=400, detail="Invalid callback data"
             )
@@ -160,5 +163,5 @@ async def payment_callback(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Error handling payment callback: {e}")
         raise HTTPException(
-            status_code=500, detail="Failed to process payment callback"
+            status_code=500, detail=f"Failed to process payment callback: {e}"
         )
