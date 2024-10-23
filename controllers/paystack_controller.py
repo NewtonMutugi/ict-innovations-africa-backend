@@ -151,7 +151,7 @@ async def payment_callback(request: Request, db: Session = Depends(get_db)):
             if payment_record:
                 payment_record.status = "completed"
                 db.commit()
-                return {"message": "Payment processed successfully"}
+                return {"message": "Payment processed successfully", "data": payment_record}
             else:
                 return {"message": "Payment not found"}
 
