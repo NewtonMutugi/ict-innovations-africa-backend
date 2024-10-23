@@ -98,8 +98,7 @@ async def verify_payment(reference: str, db: Session = Depends(get_db)):
             Payment.paymentReference == payment_reference).first()
 
         if existing_payment:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                detail="Payment reference already exists")
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Payment reference already exists", data=existing_payment)
 
         # Create a new payment record
         # payment_record = Payment(
