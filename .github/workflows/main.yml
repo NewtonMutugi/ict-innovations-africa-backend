@@ -10,19 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Deploy to server
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SERVER: ${{ secrets.SERVER }}
-        USERNAME: ${{ secrets.USERNAME }}
-      run: |
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-        ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
-          cd ~/online_payment_api_fastApi
-          git pull origin main  # Pull the latest changes from GitHub
-          docker-compose down   # Stop and remove the running containers
-          docker-compose up -d --build  # Rebuild and start containers in the background
-        EOF
+      - name: Start SSH agent and deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER: ${{ secrets.SERVER }}
+          USERNAME: ${{ secrets.USERNAME }}
+        run: |
+          eval $(ssh-agent -s)  # Start the SSH agent
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null  # Add the private key
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
+            cd ~/online_payment_api_fastApi
+            git pull origin main  # Pull the latest changes from GitHub
+            docker-compose down   # Stop and remove the running containers
+            docker-compose up -d --build  # Rebuild and start containers in the background
+          EOF
