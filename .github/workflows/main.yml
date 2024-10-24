@@ -19,8 +19,13 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
           USERNAME: ${{ secrets.USERNAME }}
         run: |
-          eval $(ssh-agent -s)  # Start the SSH agent
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null  # Add the private key
+          # Start the SSH agent
+          eval $(ssh-agent -s)
+
+          # Add the private key to the SSH agent
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+          # Connect to the server and execute commands
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
             cd ~/online_payment_api_fastApi
             git pull origin main  # Pull the latest changes from GitHub
