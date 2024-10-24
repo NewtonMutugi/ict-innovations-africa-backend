@@ -7,7 +7,7 @@ from api.paystack_api import paystack_api
 router = APIRouter()
 
 # Constants
-PAYMENT_AMOUNT = 1000
+PAYMENT_AMOUNT = 4900
 CALLBACK_URL = "https://yourdomain.com/callback"
 
 # Dependency for database session
@@ -37,6 +37,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
         payment_details = {
             "amount": amount,
             "email": email,
+            "currency": "USD",
             # "callback_url": CALLBACK_URL,
             "metadata": {
                 "amount": amount,
