@@ -37,7 +37,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
         payment_details = {
             "amount": amount,
             "email": email,
-            "currency": "USD",
+            "currency": "KSH",
             # "callback_url": CALLBACK_URL,
             "metadata": {
                 "amount": amount,
@@ -71,7 +71,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Error initializing payment: {e}")
         raise HTTPException(
-            status_code=500, detail="Failed to initialize payment")
+            status_code=500, detail="Error initializing payment: {e}")
 
 
 @router.get("/verify")
