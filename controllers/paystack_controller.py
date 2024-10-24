@@ -8,7 +8,6 @@ router = APIRouter()
 
 # Constants
 PAYMENT_AMOUNT = 4900
-CALLBACK_URL = "https://yourdomain.com/callback"
 
 # Dependency for database session
 
@@ -71,7 +70,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Error initializing payment: {e}")
         raise HTTPException(
-            status_code=500, detail="Error initializing payment: {e}")
+            status_code=500, detail=f"Error initializing payment: {e}")
 
 
 @router.get("/verify")
