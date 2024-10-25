@@ -7,7 +7,7 @@ from api.paystack_api import paystack_api
 router = APIRouter()
 
 # Constants
-PAYMENT_AMOUNT = 4900
+PAYMENT_AMOUNT = 500000 # 5000 KSH
 
 # Dependency for database session
 
