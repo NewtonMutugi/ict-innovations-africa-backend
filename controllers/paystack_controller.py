@@ -7,7 +7,7 @@ from api.paystack_api import paystack_api
 router = APIRouter()
 
 # Constants
-PAYMENT_AMOUNT = 500000 # 5000 KSH
+PAYMENT_AMOUNT = 500000  # 5000 KSH
 
 # Dependency for database session
 
@@ -36,7 +36,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
         payment_details = {
             "amount": amount,
             "email": email,
-            "currency": "KES",
+            "currency": "USD",
             # "callback_url": CALLBACK_URL,
             "metadata": {
                 "amount": amount,
