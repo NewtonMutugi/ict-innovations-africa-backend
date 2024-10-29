@@ -11,6 +11,7 @@ class Payment(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     phone = Column(String, nullable=False)
+    country = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     status = Column(String, nullable=False)
     paymentReference = Column(String, nullable=False, unique=True)
