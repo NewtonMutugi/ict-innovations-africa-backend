@@ -38,6 +38,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
             "email": email,
             "currency": "USD",
             # "callback_url": CALLBACK_URL,
+            "channels": ["card", "bank", "ussd", "qr", "mobile_money"],
             "metadata": {
                 "amount": amount,
                 "email": email,
