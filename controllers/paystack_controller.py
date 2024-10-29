@@ -7,7 +7,8 @@ from api.paystack_api import paystack_api
 router = APIRouter()
 
 # Constants
-PAYMENT_AMOUNT = 3900  # 39 USD
+USD_PAYMENT_AMOUNT = 3900  # 39 USD
+KSH_PAYMENT_AMOUNT = 500000  # 5000 KSH
 
 # Dependency for database session
 
@@ -24,26 +25,34 @@ def get_db():
 async def initialize_payment(request: Request, db: Session = Depends(get_db)):
     try:
         body = await request.json()
-        amount = PAYMENT_AMOUNT
+        amount = USD_PAYMENT_AMOUNT
         email = body.get('email')
         name = body.get('name')
         phone = body.get('phone')
+        country = body.get('country')
 
         if not email or not name:
             raise HTTPException(
                 status_code=400, detail="Email and Name are required.")
 
+        if country == "Kenya":
+            amount = KSH_PAYMENT_AMOUNT
+            CURRENCY = "KES"
+        else:
+            amount = USD_PAYMENT_AMOUNT
+            CURRENCY = "USD"
+
         payment_details = {
             "amount": amount,
             "email": email,
-            "currency": "USD",
-            # "callback_url": CALLBACK_URL,
-            "channels": ["card", "bank", "ussd", "qr", "mobile_money"],
+            "currency": CURRENCY,
+            "channels": ["mobile_money", "card"],
             "metadata": {
                 "amount": amount,
                 "email": email,
                 "name": name,
-                "phone": phone
+                "phone": phone,
+                "country": country
             }
         }
 
@@ -55,6 +64,7 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
             amount=amount,
             email=email,
             name=name,
+            country=country,
             paymentReference=reference,
             phone=phone,
             status="pending"
