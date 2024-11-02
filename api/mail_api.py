@@ -1,7 +1,7 @@
 import smtplib
 
 from fastapi import HTTPException
-from ..controllers.mail_controller import ContactForm
+from models.contact_form import ContactForm
 from settings import settings
 
 

@@ -1,14 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, EmailStr
 from api.mail_api import mail_api
+from models.contact_form import ContactForm
 
 router = APIRouter()
-
-
-class ContactForm(BaseModel):
-    name: str
-    email: EmailStr
-    message: str
 
 
 @router.post("/contact")
