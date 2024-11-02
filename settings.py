@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     PAYSTACK_SECRET_KEY: str
     PAYSTACK_BASE_URL: str
     POSTGRES_URL: str
+    EMAIL_SENDER: str
+    EMAIL_RECEIVER: str
+    EMAIL_PASSWORD: str
+    SMTP_SERVER: str
+    SMTP_PORT: int
 
     class Config:
         env_file = './.env'
