@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from api.mail_api import mail_api
-from database.schema import ContactForm
+from models.contact_form import ContactForm
 from database.database import SessionLocal
 from sqlalchemy.orm import Session
+from database.schema import ContactForm as Form
 
 router = APIRouter()
 
@@ -45,7 +46,10 @@ async def webgenerator_email(contact_form: ContactForm, db: Session = Depends(ge
         # Connect to the server and send the email
         mail_api.send_email(contact_form)
 
-        db.add(contact_form)
+        # Save the contact form to the database
+        form = Form(name=contact_form.name,
+                           email=contact_form.email, message=contact_form.message)
+        db.add(form)
         db.commit()
         db.refresh(contact_form)
 
