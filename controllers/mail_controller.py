@@ -4,6 +4,7 @@ from models.contact_form import ContactForm
 from database.database import SessionLocal
 from sqlalchemy.orm import Session
 from database.schema import ContactForm as Form
+import logging
 
 router = APIRouter()
 
@@ -38,6 +39,8 @@ async def send_email(contact_form: ContactForm):
 async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
     try:
         contact_form: ContactForm = await request.json()
+        logging.info(f"Received contact form: {contact_form}")
+
         # Create message
         message = "Subject: New Contact Us Message\n\n"
         message += f"Name: {contact_form.name}\n"
@@ -56,5 +59,6 @@ async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
 
         return {"message": "Email sent successfully"}
     except Exception as e:
+        logging.error(f"Error occurred: {e}")
         raise HTTPException(
             status_code=500, detail="Failed to send email") from e
