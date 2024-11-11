@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from api.mail_api import mail_api
 from models.contact_form import ContactForm
 from database.database import SessionLocal
@@ -35,8 +35,9 @@ async def send_email(contact_form: ContactForm):
 
 
 @router.post("/webgenerator-email")
-async def webgenerator_email(contact_form: ContactForm, db: Session = Depends(get_db)):
+async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
     try:
+        contact_form: ContactForm = await request.json()
         # Create message
         message = "Subject: New Contact Us Message\n\n"
         message += f"Name: {contact_form.name}\n"
@@ -48,7 +49,7 @@ async def webgenerator_email(contact_form: ContactForm, db: Session = Depends(ge
 
         # Save the contact form to the database
         form = Form(name=contact_form.name,
-                           email=contact_form.email, message=contact_form.message)
+                    email=contact_form.email, message=contact_form.message)
         db.add(form)
         db.commit()
         db.refresh(contact_form)
