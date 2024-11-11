@@ -19,5 +19,16 @@ class Payment(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+class ContactForm(Base):
+    __tablename__ = 'webGenerator_contact_form'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
 # Create tables if they do not exist
 Base.metadata.create_all(engine)
