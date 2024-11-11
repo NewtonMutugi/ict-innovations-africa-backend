@@ -40,6 +40,7 @@ async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
     try:
         contact_form = await request.json()
         logging.info(f"Received contact form: {contact_form}")
+        print(f"Received contact form: {contact_form}")
 
         # Create message
         # message = "Subject: New Contact Us Message\n\n"
