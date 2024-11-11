@@ -38,24 +38,24 @@ async def send_email(contact_form: ContactForm):
 @router.post("/webgenerator-email")
 async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
     try:
-        contact_form: ContactForm = await request.json()
+        contact_form = await request.json()
         logging.info(f"Received contact form: {contact_form}")
 
         # Create message
-        message = "Subject: New Contact Us Message\n\n"
-        message += f"Name: {contact_form.name}\n"
-        message += f"Email: {contact_form.email}\n"
-        message += f"Message:\n{contact_form.message}"
+        # message = "Subject: New Contact Us Message\n\n"
+        # message += f"Name: {contact_form.name}\n"
+        # message += f"Email: {contact_form.email}\n"
+        # message += f"Message:\n{contact_form.message}"
 
         # Connect to the server and send the email
-        mail_api.send_email(contact_form)
+        # mail_api.send_email(contact_form)
 
         # Save the contact form to the database
-        form = Form(name=contact_form.name,
-                    email=contact_form.email, message=contact_form.message)
-        db.add(form)
-        db.commit()
-        db.refresh(contact_form)
+        # form = Form(name=contact_form.name,
+        #             email=contact_form.email, message=contact_form.message)
+        # db.add(form)
+        # db.commit()
+        # db.refresh(contact_form)
 
         return {"message": "Email sent successfully"}
     except Exception as e:
