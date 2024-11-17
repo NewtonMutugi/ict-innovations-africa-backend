@@ -4,6 +4,8 @@ from models.contact_form import ContactForm
 from database.database import SessionLocal
 from sqlalchemy.orm import Session
 from database.schema import ContactForm as Form
+from pydantic import ValidationError
+
 import logging
 
 router = APIRouter()
@@ -38,9 +40,10 @@ async def send_email(contact_form: ContactForm):
 @router.post("/webgenerator-email")
 async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
     try:
-        contact_form = await request.json()
-        logging.info(f"Received contact form: {contact_form}")
-        print(f"Received contact form: {contact_form}")
+        # Parse request JSON into a Pydantic model
+        form_data = await request.json()
+        logging.info(f"Received contact form: {form_data}")
+        contact_form = ContactForm(**form_data)
 
         # Create message
         message = "Subject: New Contact Us Message\n\n"
@@ -48,18 +51,25 @@ async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
         message += f"Email: {contact_form.email}\n"
         message += f"Message:\n{contact_form.message}"
 
-        # Connect to the server and send the email
-        mail_api.send_email(contact_form)
+        # Send the email
+        await mail_api.send_email(contact_form)
 
         # Save the contact form to the database
-        form = Form(name=contact_form.name,
-                    email=contact_form.email, message=contact_form.message)
+        form = Form(
+            name=contact_form.name,
+            email=contact_form.email,
+            message=contact_form.message
+        )
         db.add(form)
         db.commit()
-        db.refresh(contact_form)
+        db.refresh(form)
 
         return {"message": "Email sent successfully"}
+    except ValidationError as ve:
+        logging.error(f"Validation error: {ve}")
+        raise HTTPException(status_code=422, detail="Invalid form data")
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         raise HTTPException(
-            status_code=500, detail="Failed to send email") from e
+            status_code=500, detail="Failed to process the request"
+        )
