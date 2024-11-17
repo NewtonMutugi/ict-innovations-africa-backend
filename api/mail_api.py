@@ -18,7 +18,8 @@ class MailApi:
             message += f"Email: {contact_form.email}\n"
             message += f"Message:\n{contact_form.message}"
 
-            with smtplib.SMTP_SSL(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
+            with smtplib.SMTP(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
+                server.starttls()
                 server.login(self.sender_email, self.password)
                 server.sendmail(self.sender_email,
                                 self.receiver_email, message)

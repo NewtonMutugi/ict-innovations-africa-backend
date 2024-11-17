@@ -27,7 +27,7 @@ async def send_email(contact_form: ContactForm):
         message += f"Message:\n{contact_form.message}"
 
         # Connect to the server and send the email
-        mail_api.send_email(contact_form)
+        await mail_api.send_email(contact_form)
 
         return {"message": "Email sent successfully"}
     except Exception as e:
