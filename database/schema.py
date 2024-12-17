@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Float, DateTime, Integer
+from sqlalchemy import Column, String, Float, DateTime, Integer, ForeignKey, Table
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from database.database import Base
 from database.database import engine
@@ -30,6 +31,15 @@ class ContactForm(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+# Many-to-many relationship tab;e
+event_tags = Table(
+    'events_tags',
+    Base.metadata,
+    Column('event_id', Integer, ForeignKey('events.id')),
+    Column('tag_id', Integer, ForeignKey('eventTags.id'))
+)
+
+
 class Event(Base):
     __tablename__ = 'events'
 
@@ -39,48 +49,37 @@ class Event(Base):
     image = Column(String, nullable=False)
     venue = Column(String, nullable=False)
     type = Column(String, nullable=False)
-    tags = Column(String, nullable=False)
+    tags = relationship("Tag", secondary=event_tags,
+                        back_populates='events')  # Many-to-many relationship
     eventDate = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    eventImages = Column(String, nullable=False)
+    eventImages = relationship(
+        'EventImages', back_populates='event')
     registrationLink = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    
 
-# {
-#     id: 1,
-#     title: "Preparing the Youth for the Future",
-#     paragraph:
-#     "Join us in an insightful session designed to empower and guide young leaders on using technology and becoming early adopters.",
-#     image: "/images/events/monetize_ai.jpg",
-#     venue: {
-#         name: "Online",
-#         image: "/images/blog/author-01.png",
-#         designation: "Graphic Designer",
-#     },
-#     type: "online",
-#     tags: ["AI Monetization", "technology", "future"],
-#     eventDate: "To be Announced",
-#     description:
-#     "This session will equip participants with actionable strategies to navigate career path selection and cultivate life skills essential for professional and personal growth.<br />Participants will learn how to leverage AI for creating dynamic presentations, summarizing complex content, and extracting key insights from documents, including PDFs and YouTube videos. Discover how these tools can make learning more efficient and engaging.<br />We’ll also explore the monetization of AI, offering insights on how to capitalize on AI as early adopters, including creating visually stunning websites through AI-driven solutions.",
-#     eventImages: [
-#         {
-#           image: "/images/events/enhancinglearningwithAI.jpg",
+class EventImages(Base):
+    __tablename__ = 'eventImages'
 
-#           imageTitle: "Enhancing Learning with AI",
-#           imageDescription:
-#           "Streamline your studies with AI tools that make content accessible, engaging, and easy to manage.",
-#         },
-#         {
-#             image: "/images/events/monetize_ai.jpg",
-#             imageTitle: "Monetizing AI",
-#             imageDescription:
-#             "Discover how to create visually stunning websites through AI-driven solutions.",
-#         },
-#     ],
-#     registrationLink: "https://forms.gle/QwHoJ7adbv1vJzDk9",
-# },
+    id = Column(Integer, primary_key=True, index=True)
+    imageUrl = Column(String, nullable=False)
+    imageDescription = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    event_id = Column(Integer, ForeignKey('events.id')
+                      )  # Foreign key to events table
+    event = relationship('Event', back_populates='eventImages')
+
+
+class Tag(Base):
+    __tablename__ = 'tags'
+
+    id = Column(Integer, primary_key=True, index=True)
+    tagName = Column(String, nullable=False)
+    event = relationship("Event", secondary=event_tags, back_populates="tags")
+
+
 # Create tables if they do not exist
 Base.metadata.create_all(engine)
