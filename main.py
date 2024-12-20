@@ -6,6 +6,7 @@ import uvicorn
 from settings import settings
 from database.database import Base
 from database.database import engine
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -20,6 +21,9 @@ app.add_middleware(
 
 # Create tables if they do not exist
 Base.metadata.create_all(engine)
+
+# Serving images from the 'uploads' directory
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")
