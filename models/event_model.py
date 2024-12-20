@@ -54,7 +54,7 @@ class EventBase(BaseModel):
 
 class EventCreate(EventBase):
     tags: List[TagCreate]
-    eventImages: List[EventImageCreate]
+    eventImages: Optional[List[EventImageCreate]] = None
 
 
 class EventResponse(BaseModel):
