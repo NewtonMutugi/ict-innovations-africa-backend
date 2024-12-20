@@ -32,11 +32,10 @@ class ContactForm(Base):
 
 
 # Many-to-many relationship tab;e
-event_tags = Table(
-    'events_tags',
-    Base.metadata,
-    Column('event_id', Integer, ForeignKey('events.id')),
-    Column('tag_id', Integer, ForeignKey('eventTags.id'))
+event_tag_table = Table(
+    'event_tag', Base.metadata,
+    Column('event_id', Integer, ForeignKey('events.id'), primary_key=True),
+    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
 )
 
 
@@ -49,28 +48,16 @@ class Event(Base):
     image = Column(String, nullable=False)
     venue = Column(String, nullable=False)
     type = Column(String, nullable=False)
-    tags = relationship("Tag", secondary=event_tags,
-                        back_populates='events')  # Many-to-many relationship
     eventDate = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    eventImages = relationship(
-        'EventImages', back_populates='event')
+
     registrationLink = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-
-class EventImages(Base):
-    __tablename__ = 'eventImages'
-
-    id = Column(Integer, primary_key=True, index=True)
-    imageUrl = Column(String, nullable=False)
-    imageDescription = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    event_id = Column(Integer, ForeignKey('events.id')
-                      )  # Foreign key to events table
-    event = relationship('Event', back_populates='eventImages')
+    tags = relationship('Tag', secondary=event_tag_table,
+                        back_populates='events')
+    eventImages = relationship('EventImages', back_populates='event')
 
 
 class Tag(Base):
@@ -78,7 +65,25 @@ class Tag(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     tagName = Column(String, nullable=False)
-    event = relationship("Event", secondary=event_tags, back_populates="tags")
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    events = relationship(
+        'Event', secondary=event_tag_table, back_populates='tags')
+
+
+class EventImages(Base):
+    __tablename__ = 'eventImages'
+
+    id = Column(Integer, primary_key=True, index=True)
+    imageTitle = Column(String, nullable=False)
+    imageUrl = Column(String, nullable=False)
+    imageDescription = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    event_id = Column(Integer, ForeignKey('events.id'))
+
+    event = relationship('Event', back_populates='eventImages')
 
 
 # Create tables if they do not exist
