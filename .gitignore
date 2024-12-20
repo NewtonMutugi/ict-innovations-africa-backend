@@ -163,3 +163,7 @@ cython_debug/
 
 # Uploads
 uploads
+
+# ignore docker files
+docker-entrypoint-initdb.d/
+
