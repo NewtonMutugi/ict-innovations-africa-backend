@@ -1,6 +1,7 @@
+import logging
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt import PyJWTError as JWTError, PyJWT as jwt
+import jwt
 from sqlalchemy.orm import Session
 from auth.utils import ALGORITHM, SECRET_KEY, verify_password
 from models.auth_model import TokenData
@@ -51,12 +52,19 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
+            logging.error("Token does not contain a username (sub).")
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
+    except jwt.PyJWTError as e:
+        logging.error(f"Token decoding error: {e}")
         raise credentials_exception
-    user = get_user(db, username=token_data.username)
+    user = None
+    if check_if_username_is_email(token_data.username):
+        user = get_user(db, email=token_data.username)
+    else:
+        user = get_user(db, username=token_data.username)
     if user is None:
+        logging.error(f"No user found with username: {token_data.username}")
         raise credentials_exception
     return user
 
