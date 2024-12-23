@@ -65,6 +65,14 @@ async def create_event(
     except JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON payload")
 
+     # Ensure the image field is present
+    if 'image' not in event_data:
+        raise HTTPException(status_code=400, detail="Image field is required")
+
+     # Save Event Images
+    for image in images:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            raise HTTPException(status_code=400, detail="Invalid file type")
     # Save event details
     db_event = Event(
         title=event_obj.title,
@@ -88,6 +96,7 @@ async def create_event(
             db.add(db_tag)
         db_event.tags.append(db_tag)
 
+    image_data = []
     # Save Event Images
     for image in images:
         if image.content_type not in ["image/jpeg", "image/png"]:
@@ -99,11 +108,14 @@ async def create_event(
             content = await image.read()
             f.write(content)
 
+        # Get the image description and image title from the request body
+        image_data = event_obj.eventImages[images.index(image)]
+
         # Create EventImages record
         db_image = EventImages(
             imageUrl=file_path,
-            imageDescription="Uploaded event image",
-            imageTitle=image.filename,
+            imageDescription=image_data.imageDescription,
+            imageTitle=image_data.imageTitle,
             event=db_event
         )
         db.add(db_image)
@@ -265,7 +277,7 @@ async def update_event_images(
 
     # Add new images
     for image in new_images:
-        if image.content_type not in ["image/jpeg", "image/png"]:
+        if image.content_type not in ["image/jpeg", "image/png", "image/webp"]:
             raise HTTPException(status_code=400, detail="Invalid file type")
 
         # Save file to the upload directory
