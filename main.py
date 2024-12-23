@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from routes import router
 import uvicorn
 from settings import settings
 from database.database import Base
 from database.database import engine
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
