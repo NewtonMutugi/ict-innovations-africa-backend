@@ -5,7 +5,8 @@ import os
 from typing import List
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from database.schema import Event, EventImages, Tag
+from auth.dependancies import get_current_user
+from database.schema import Event, EventImages, Tag, User
 from database.database import SessionLocal
 from models.event_model import EventCreate, EventImageResponse, EventResponse, EventUpdateRequest, TagResponse
 
@@ -56,7 +57,8 @@ router = APIRouter()
 async def create_event(
     event: str = File(...),  # JSON payload as a string
     images: List[UploadFile] = File(...),  # File uploads
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     # Parse the JSON string into the EventCreate Pydantic model
     try:
@@ -103,7 +105,8 @@ async def create_event(
             raise HTTPException(status_code=400, detail="Invalid file type")
 
         # Save file to the upload directory
-        file_path = os.path.join(UPLOAD_DIR, f"event_{db_event.id}_{image.filename}")
+        file_path = os.path.join(UPLOAD_DIR, f"event_{
+                                 db_event.id}_{image.filename}")
         with open(file_path, "wb") as f:
             content = await image.read()
             f.write(content)
@@ -143,7 +146,7 @@ def get_event(event_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/event/{event_id}", response_model=EventResponse)
-def update_event(event_id: int, event: EventCreate, db: Session = Depends(get_db)):
+def update_event(event_id: int, event: EventCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """ Update event """
     db_event = db.query(Event).filter(Event.id == event_id).first()
     if not db_event:
@@ -155,7 +158,7 @@ def update_event(event_id: int, event: EventCreate, db: Session = Depends(get_db
     db_event.image = event.image
     db_event.venue = event.venue
     db_event.type = event.type
-    db_event.eventDate = event.eventDate
+    db_event.eventDate = event.eventDate = "TBA" if event.eventDate is None else event.eventDate
     db_event.description = event.description
     db_event.registrationLink = event.registrationLink
 
@@ -184,7 +187,7 @@ def update_event(event_id: int, event: EventCreate, db: Session = Depends(get_db
 
 
 @router.delete("/event/{event_id}")
-def delete_event(event_id: int, db: Session = Depends(get_db)):
+def delete_event(event_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """ Delete event """
     db_event = db.query(Event).filter(Event.id == event_id).first()
     if not db_event:
@@ -281,7 +284,8 @@ async def update_event_images(
             raise HTTPException(status_code=400, detail="Invalid file type")
 
         # Save file to the upload directory
-        file_path = os.path.join(UPLOAD_DIR, f"event_{event_id}_{image.filename}")
+        file_path = os.path.join(UPLOAD_DIR, f"event_{
+                                 event_id}_{image.filename}")
         with open(file_path, "wb") as f:
             content = await image.read()
             f.write(content)
