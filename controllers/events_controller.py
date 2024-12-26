@@ -76,13 +76,14 @@ async def create_event(
         if image.content_type not in ["image/jpeg", "image/png"]:
             raise HTTPException(status_code=400, detail="Invalid file type")
     # Save event details
+    event_date = "TBA" if event_obj.eventDate is None else event_obj.eventDate
     db_event = Event(
         title=event_obj.title,
         paragraph=event_obj.paragraph,
         image=event_obj.image,
         venue=event_obj.venue,
         type=event_obj.type,
-        eventDate=event_obj.eventDate,
+        eventDate=event_date,
         description=event_obj.description,
         registrationLink=event_obj.registrationLink
     )

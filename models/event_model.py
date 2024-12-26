@@ -47,7 +47,7 @@ class EventBase(BaseModel):
     image: str
     venue: str
     type: str
-    eventDate: str
+    eventDate: Optional[str] = None
     description: str
     registrationLink: str
 
