@@ -105,8 +105,7 @@ async def create_event(
             raise HTTPException(status_code=400, detail="Invalid file type")
 
         # Save file to the upload directory
-        file_path = os.path.join(UPLOAD_DIR, f"event_{
-                                 db_event.id}_{image.filename}")
+        file_path = os.path.join(UPLOAD_DIR, f"event_{db_event.id}_{image.filename}")
         with open(file_path, "wb") as f:
             content = await image.read()
             f.write(content)
@@ -284,8 +283,7 @@ async def update_event_images(
             raise HTTPException(status_code=400, detail="Invalid file type")
 
         # Save file to the upload directory
-        file_path = os.path.join(UPLOAD_DIR, f"event_{
-                                 event_id}_{image.filename}")
+        file_path = os.path.join(UPLOAD_DIR, f"event_{event_id}_{image.filename}")
         with open(file_path, "wb") as f:
             content = await image.read()
             f.write(content)
