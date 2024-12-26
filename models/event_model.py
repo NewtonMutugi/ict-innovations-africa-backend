@@ -64,6 +64,8 @@ class EventResponse(BaseModel):
     image: str
     venue: str
     type: str
+    description: str
+    registrationLink: str
     eventDate: Optional[str] = None
     created_at: datetime
     updated_at: datetime
