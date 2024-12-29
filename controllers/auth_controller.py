@@ -51,7 +51,7 @@ def login_for_access_token_with_json(user: UserModel, db: Session = Depends(get_
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/signup", response_model=UserResponse)
+@router.post("/signup", response_model=UserResponse, status_code=201)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     db_user = get_user(db, username=user.username)
     if db_user:

@@ -53,7 +53,7 @@ router = APIRouter()
 #     db.refresh(db_event)
 #     return db_event
 
-@router.post("/event", response_model=EventResponse)
+@router.post("/event", response_model=EventResponse, status_code=201)
 async def create_event(
     event: str = File(...),  # JSON payload as a string
     images: List[UploadFile] = File(...),  # File uploads
