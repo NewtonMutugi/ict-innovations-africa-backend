@@ -176,3 +176,9 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=500, detail=f"Failed to process payment callback: {e}"
         )
+
+
+@router.get("/payments")
+async def get_payments(db: Session = Depends(get_db)):
+    payments = db.query(Payment).all()
+    return payments
