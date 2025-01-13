@@ -23,20 +23,7 @@ jobs:
           eval $(ssh-agent -s)
 
           # Add the private key to the SSH agent
-          # echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-          # Save the SSH key to a temporary file
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ssh_key
-          chmod 600 /tmp/ssh_key
-          
-          # Add the SSH key to the agent
-          if ! ssh-add /tmp/ssh_key; then
-            echo "Failed to add SSH key"
-            exit 1
-          fi
-          
-          # Clean up the temporary key file
-          rm /tmp/ssh_key
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
           # Connect to the server and execute commands
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
