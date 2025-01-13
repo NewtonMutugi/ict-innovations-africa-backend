@@ -15,19 +15,24 @@ jobs:
 
       - name: Start SSH agent and deploy
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.NEW_SSH_PRIVATE_KEY }}
-          SERVER: ${{ secrets.NEW_SERVER }}
-          USERNAME: ${{ secrets.NEW_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER: ${{ secrets.SERVER }}
+          USERNAME: ${{ secrets.USERNAME }}
         run: |
           # Start the SSH agent
           eval $(ssh-agent -s)
 
           # Add the private key to the SSH agent
+<<<<<<< HEAD
           if ! echo "$NEW_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -; then
             echo "Failed to add SSH key. Check the key format."
             exit 1
           fi
           
+=======
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+>>>>>>> parent of c380a31 (Update main.yml)
           # Connect to the server and execute commands
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
             cd ~/online_payment_api_fastApi
