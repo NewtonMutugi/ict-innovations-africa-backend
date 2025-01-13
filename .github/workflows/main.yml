@@ -28,6 +28,9 @@ jobs:
           # Save the SSH key to a temporary file
           echo "$NEW_SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
+
+          # Check the key format (Optional step)
+          cat /tmp/ssh_key 
           
           # Add the SSH key to the agent
           if ! ssh-add /tmp/ssh_key; then
