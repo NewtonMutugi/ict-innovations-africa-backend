@@ -15,15 +15,15 @@ jobs:
 
       - name: Start SSH agent and deploy
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER: ${{ secrets.SERVER }}
-          USERNAME: ${{ secrets.USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.NEW_SSH_PRIVATE_KEY }}
+          SERVER: ${{ secrets.NEW_SERVER }}
+          USERNAME: ${{ secrets.NEW_USERNAME }}
         run: |
           # Start the SSH agent
           eval $(ssh-agent -s)
 
           # Add the private key to the SSH agent
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+          echo "$NEW_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
           # Connect to the server and execute commands
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
