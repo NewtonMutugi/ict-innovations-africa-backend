@@ -23,16 +23,8 @@ jobs:
           eval $(ssh-agent -s)
 
           # Add the private key to the SSH agent
-<<<<<<< HEAD
-          if ! echo "$NEW_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -; then
-            echo "Failed to add SSH key. Check the key format."
-            exit 1
-          fi
-          
-=======
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
->>>>>>> parent of c380a31 (Update main.yml)
           # Connect to the server and execute commands
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER << 'EOF'
             cd ~/online_payment_api_fastApi
