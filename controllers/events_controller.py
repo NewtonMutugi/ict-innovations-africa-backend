@@ -97,7 +97,8 @@ async def create_event(
         if not db_tag:
             db_tag = Tag(tagName=tag.tagName)
             db.add(db_tag)
-        db_event.tags.append(db_tag)
+        if db_tag not in db_event.tags:
+            db_event.tags.append(db_tag)
 
     image_data = []
     # Save Event Images
