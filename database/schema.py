@@ -27,13 +27,15 @@ class HostingPayment(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    hosting_plan_id = Column(Integer, ForeignKey('hosting_plans.id'))
+    hosting_plan_id = Column(Integer, ForeignKey(
+        'hosting_plans.id'), nullable=False)
     status = Column(String, nullable=False)
     paymentReference = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    hosting_plan = relationship('HostingPlans', back_populates='hosting_payments')
+    hosting_plan = relationship(
+        'HostingPlans', back_populates='hosting_payments')
 
 
 class HostingPlans(Base):
@@ -46,6 +48,11 @@ class HostingPlans(Base):
     subtitle = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    hosting_payments = relationship(
+        'HostingPayment', back_populates='hosting_plan', cascade='all, delete-orphan')
+    hosting_plan_features = relationship(
+        'HostingPlanFeatures', back_populates='hosting_plan', cascade='all, delete-orphan')
 
 
 class HostingPlanFeatures(Base):
