@@ -20,6 +20,47 @@ class Payment(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+class HostingPayment(Base):
+    __tablename__ = 'hosting_payments'
+
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    hosting_plan_id = Column(Integer, ForeignKey('hosting_plans.id'))
+    status = Column(String, nullable=False)
+    paymentReference = Column(String, nullable=False, unique=True)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    hosting_plan = relationship('HostingPlans', back_populates='hosting_payments')
+
+
+class HostingPlans(Base):
+    __tablename__ = 'hosting_plans'
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    monthly_price = Column(Float, nullable=False)
+    annual_price = Column(Float, nullable=False)
+    subtitle = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+class HostingPlanFeatures(Base):
+    __tablename__ = 'hosting_plan_features'
+
+    id = Column(Integer, primary_key=True, index=True)
+    feature = Column(String, nullable=False)
+    hosting_plan_id = Column(Integer, ForeignKey('hosting_plans.id'))
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    hosting_plan = relationship(
+        'HostingPlans', back_populates='hosting_plan_features')
+
+
 class ContactForm(Base):
     __tablename__ = 'webGenerator_contact_form'
 
@@ -97,6 +138,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
+
 
 # Create tables if they do not exist
 Base.metadata.create_all(engine)
