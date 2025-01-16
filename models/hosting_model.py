@@ -14,7 +14,6 @@ class HostingPlanFeatureResponse(HostingPlanFeature):
 
 
 class HostingPlansModel(BaseModel):
-    id: int
     title: str
     subtitle: str
     annual_price: float
