@@ -2,11 +2,19 @@ from typing import List
 from pydantic import BaseModel
 
 
-class HostingPlanFeature(BaseModel): 
+class HostingPlanFeature(BaseModel):
     feature: str
 
 
+class HostingPlanFeatureResponse(HostingPlanFeature):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
 class HostingPlansModel(BaseModel):
+    id: int
     title: str
     subtitle: str
     annual_price: float
@@ -21,4 +29,7 @@ class HostingPlansCreate(HostingPlansModel):
 
 
 class HostingPlansResponse(HostingPlansModel):
-    features: List[HostingPlanFeature]
+    features: List[HostingPlanFeatureResponse] = []
+
+    class Config:
+        orm_mode = True
