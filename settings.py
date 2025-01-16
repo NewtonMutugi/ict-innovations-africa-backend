@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SMTP_SERVER: str
     SMTP_PORT: int
     AUTH_SECRET_KEY: str
+    CALLBACK_URL: str
 
     class Config:
         env_file = './.env'
