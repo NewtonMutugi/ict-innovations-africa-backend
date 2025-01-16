@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from api.paystack_api import paystack_api
 from database.database import SessionLocal
 from sqlalchemy.orm import Session
 
 from database.schema import HostingPayment, HostingPlans
 from models.hosting_payment_model import HostingPaymentModel, HostingPaymentResponse
+from settings import settings
 
 router = APIRouter()
 
@@ -36,11 +38,13 @@ async def initialize_payment(payment: HostingPaymentModel, db: Session = Depends
                 status_code=400, detail="Email and Name are required.")
 
         amount = hosting_plan.annual_price
+        print(settings.CALLBACK_URL)
 
         payment_details = {
             "currency": "KES",
             "amount": amount * 100,
             "email": email,
+            "callback_url": settings.CALLBACK_URL,
             "channels": ["mobile_money", "card"],
             "metadata": {
                 "amount": amount,
@@ -139,11 +143,11 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
             if payment_record:
                 payment_record.status = "completed"
                 db.commit()
-                return {"message": "Payment processed successfully", "data": payment_record}
+                return JSONResponse(status_code=200, content={"message": "Payment processed successfully", "data": payment_record})
             else:
-                return {"message": "Payment not found"}
+                return JSONResponse(status_code=404, content={"message": "Payment not found"})
 
-        return {"message": "Payment failed or not successful"}
+        return JSONResponse(status_code=400, content={"message": "Payment failed or not successful"})
 
     except Exception as e:
         print(f"Error handling payment callback: {e}")
