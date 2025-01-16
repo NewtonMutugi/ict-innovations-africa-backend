@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Request,status
-from api import paystack_api
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from api.paystack_api import paystack_api
 from database.database import SessionLocal
 from sqlalchemy.orm import Session
 
 from database.schema import HostingPayment, HostingPlans
+from models.hosting_payment_model import HostingPaymentModel, HostingPaymentResponse
 
 router = APIRouter()
+
 
 def get_db():
     db = SessionLocal()
@@ -16,19 +18,18 @@ def get_db():
 
 
 @router.post("/initialize")
-async def initialize_payment(request: Request, db: Session = Depends(get_db)):
+async def initialize_payment(payment: HostingPaymentModel, db: Session = Depends(get_db)):
     try:
-        body = await request.json()
-        hosting_plan_id = body.get('hosting_plan_id')
-        email = body.get('email')
-        full_name = body.get('full_name')
-        phone = body.get('phone')
+        email = payment.email
+        full_name = payment.full_name
+        phone = payment.phone
 
         hosting_plan = db.query(HostingPlans).filter(
-            HostingPlans.id == hosting_plan_id).first()
+            HostingPlans.id == payment.hosting_plan_id).first()
 
         if not hosting_plan:
-          raise HTTPException(status_code=400, detail="Hosting plan not found")
+            raise HTTPException(
+                status_code=400, detail="Hosting plan not found")
 
         if not email or not full_name:
             raise HTTPException(
@@ -37,7 +38,8 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
         amount = hosting_plan.annual_price
 
         payment_details = {
-            "amount": amount,
+            "currency": "KES",
+            "amount": amount * 100,
             "email": email,
             "channels": ["mobile_money", "card"],
             "metadata": {
@@ -53,11 +55,11 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
 
         # Create a new payment record
         payment_record = HostingPayment(
-            amount=amount,
             email=email,
             full_name=full_name,
             paymentReference=reference,
             phone=phone,
+            hosting_plan_id=hosting_plan.id,
             status="pending"
         )
 
@@ -68,7 +70,6 @@ async def initialize_payment(request: Request, db: Session = Depends(get_db)):
             "message": "Payment initialized successfully",
             "data": data
         }
-
     except Exception as e:
         print(f"Error initializing payment: {e}")
         raise HTTPException(
