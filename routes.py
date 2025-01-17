@@ -13,4 +13,5 @@ router.include_router(mail_router, prefix="/mail", tags=["mail"])
 router.include_router(event_router, tags=["event"])
 router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(hosting_plans_router, tags=["hosting plans"])
-router.include_router(hosting_payments_router, tags=["hosting payments"])
+router.include_router(hosting_payments_router,
+                      prefix="/hosting-payments", tags=["hosting payments"])
