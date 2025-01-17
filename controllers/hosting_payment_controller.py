@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from api.paystack_api import paystack_api
 from database.database import SessionLocal
@@ -80,7 +81,7 @@ async def initialize_payment(payment: HostingPaymentModel, db: Session = Depends
             status_code=500, detail=f"Error initializing payment: {e}")
 
 
-@router.get("/verify")
+@router.get("/verify/{reference}")
 async def verify_payment(reference: str, db: Session = Depends(get_db)):
     if not reference:
         raise HTTPException(
@@ -116,21 +117,12 @@ async def verify_payment(reference: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to verify payment")
 
 
-@router.get("/callback")
+@router.get("/callback/{reference}")
 async def payment_callback(reference: str, db: Session = Depends(get_db)):
     if not reference:
         raise HTTPException(
             status_code=400, detail="Missing transaction reference")
     try:
-        # callback_data = await request.json()
-        # reference = callback_data.get("reference")
-        # status = callback_data.get("status")
-
-        if not reference:
-            raise HTTPException(
-                status_code=400, detail="Invalid callback data"
-            )
-
         # Verify payment with Paystack API to ensure status is valid
         paystack_response = await paystack_api.verify_payment(reference)
 
@@ -143,11 +135,22 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
             if payment_record:
                 payment_record.status = "completed"
                 db.commit()
-                return JSONResponse(status_code=200, content={"message": "Payment processed successfully", "data": payment_record})
-            else:
-                return JSONResponse(status_code=404, content={"message": "Payment not found"})
+                db.refresh(payment_record)  # Ensure the object is updated
 
-        return JSONResponse(status_code=400, content={"message": "Payment failed or not successful"})
+                # Use jsonable_encoder to serialize the object
+                serialized_payment = jsonable_encoder(payment_record)
+                return JSONResponse(status_code=200, content={
+                    "message": "Payment processed successfully",
+                    "data": serialized_payment
+                })
+            else:
+                return JSONResponse(status_code=404, content={
+                    "message": "Payment not found"
+                })
+
+        return JSONResponse(status_code=400, content={
+            "message": "Payment failed or not successful"
+        })
 
     except Exception as e:
         print(f"Error handling payment callback: {e}")
