@@ -2,6 +2,14 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class HostingPlanResponse(BaseModel):
+    id: int
+    title: str
+
+    class Config:
+        orm_mode = True
+
+
 class HostingPaymentModel(BaseModel):
     email: str
     full_name: str
@@ -18,6 +26,7 @@ class HostingPaymentResponse(HostingPaymentModel):
     paymentReference: str
     created_at: datetime
     updated_at: datetime
+    hosting_plan: HostingPlanResponse  # Include the nested model
 
     class Config:
         orm_mode = True

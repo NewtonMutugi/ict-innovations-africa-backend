@@ -1,9 +1,10 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from api.paystack_api import paystack_api
 from database.database import SessionLocal
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from database.schema import HostingPayment, HostingPlans
 from models.hosting_payment_model import HostingPaymentModel, HostingPaymentResponse
@@ -153,7 +154,8 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
             status_code=500, detail=f"Failed to process payment callback: {e}")
 
 
-@router.get("/payments")
+@router.get("/payments", response_model=List[HostingPaymentResponse])
 async def get_payments(db: Session = Depends(get_db)):
-    payments = db.query(HostingPayment).all()
+    payments = db.query(HostingPayment).options(
+        joinedload(HostingPayment.hosting_plan)).all()
     return payments
