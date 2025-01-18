@@ -147,6 +147,26 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
                 return JSONResponse(status_code=404, content={
                     "message": "Payment not found"
                 })
+        elif paystack_response['data']['status'] == 'abandoned':
+            payment_record = db.query(HostingPayment).filter(
+                HostingPayment.paymentReference == reference
+            ).first()
+
+            if payment_record:
+                payment_record.status = "abandoned"
+                db.commit()
+                db.refresh(payment_record)
+
+                # Use jsonable_encoder to serialize the object
+                serialized_payment = jsonable_encoder(payment_record)
+                return JSONResponse(status_code=200, content={
+                    "message": "Payment abandoned",
+                    "data": serialized_payment
+                })
+            else:
+                return JSONResponse(status_code=404, content={
+                    "message": "Payment not found"
+                })
 
         return JSONResponse(status_code=400, content={
             "message": "Payment failed or not successful"
