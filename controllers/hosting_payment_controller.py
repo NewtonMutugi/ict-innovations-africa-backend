@@ -122,61 +122,35 @@ async def payment_callback(reference: str, db: Session = Depends(get_db)):
     if not reference:
         raise HTTPException(
             status_code=400, detail="Missing transaction reference")
+
     try:
         # Verify payment with Paystack API to ensure status is valid
         paystack_response = await paystack_api.verify_payment(reference)
+        payment_status = paystack_response['data']['status']
 
-        if paystack_response['data']['status'] == 'success':
-            # Confirm the payment, update the database
+        if payment_status in ['success', 'abandoned']:
             payment_record = db.query(HostingPayment).filter(
                 HostingPayment.paymentReference == reference
             ).first()
 
-            if payment_record:
-                payment_record.status = "completed"
-                db.commit()
-                db.refresh(payment_record)  # Ensure the object is updated
+            if not payment_record:
+                return JSONResponse(status_code=404, content={"message": "Payment not found"})
 
-                # Use jsonable_encoder to serialize the object
-                serialized_payment = jsonable_encoder(payment_record)
-                return JSONResponse(status_code=200, content={
-                    "message": "Payment processed successfully",
-                    "data": serialized_payment
-                })
-            else:
-                return JSONResponse(status_code=404, content={
-                    "message": "Payment not found"
-                })
-        elif paystack_response['data']['status'] == 'abandoned':
-            payment_record = db.query(HostingPayment).filter(
-                HostingPayment.paymentReference == reference
-            ).first()
+            payment_record.status = payment_status
+            db.commit()
+            db.refresh(payment_record)
 
-            if payment_record:
-                payment_record.status = "abandoned"
-                db.commit()
-                db.refresh(payment_record)
+            # Use jsonable_encoder to serialize the object
+            serialized_payment = jsonable_encoder(payment_record)
+            message = "Payment processed successfully" if payment_status == 'success' else "Payment abandoned"
+            return JSONResponse(status_code=200, content={"message": message, "data": serialized_payment})
 
-                # Use jsonable_encoder to serialize the object
-                serialized_payment = jsonable_encoder(payment_record)
-                return JSONResponse(status_code=200, content={
-                    "message": "Payment abandoned",
-                    "data": serialized_payment
-                })
-            else:
-                return JSONResponse(status_code=404, content={
-                    "message": "Payment not found"
-                })
-
-        return JSONResponse(status_code=400, content={
-            "message": "Payment failed or not successful"
-        })
+        return JSONResponse(status_code=400, content={"message": "Payment failed or not successful"})
 
     except Exception as e:
         print(f"Error handling payment callback: {e}")
         raise HTTPException(
-            status_code=500, detail=f"Failed to process payment callback: {e}"
-        )
+            status_code=500, detail=f"Failed to process payment callback: {e}")
 
 
 @router.get("/payments")
