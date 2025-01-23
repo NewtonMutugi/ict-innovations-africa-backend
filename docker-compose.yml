@@ -26,6 +26,8 @@ services:
     build: .
     volumes:
       - ./:/usr/src/app
+      - /etc/letsencrypt/live/ictinnovations.africa/fullchain.pem:/certs/fullchain.pem:ro
+      - /etc/letsencrypt/live/ictinnovations.africa/privkey.pem:/certs/privkey.pem:ro
     ports:
       - '8000:8000'
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -44,6 +46,8 @@ services:
       - '8080:80'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - /etc/letsencrypt/live/ictinnovations.africa/fullchain.pem:/certs/fullchain.pem:ro
+      - /etc/letsencrypt/live/ictinnovations.africa/privkey.pem:/certs/privkey.pem:ro
     env_file:
       - .env
     networks:
