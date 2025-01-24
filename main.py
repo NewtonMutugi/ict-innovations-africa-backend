@@ -37,7 +37,7 @@ app.include_router(router, prefix="/api")
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"message": exc.detail},    
+        content={"message": exc.detail},
     )
 
 
@@ -57,4 +57,6 @@ async def internal_server_error_handler(request: Request, exc: Exception):
     )
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(settings.APPLICATION_PORT))
+    uvicorn.run(app, host="0.0.0.0", port=int(settings.APPLICATION_PORT),
+                ssl_keyfile="/certs/privkey.pem",
+                ssl_certfile="/certs/fullchain.pem")
