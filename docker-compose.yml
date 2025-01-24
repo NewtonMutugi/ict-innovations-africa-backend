@@ -29,7 +29,7 @@ services:
       - /etc/letsencrypt/live/ictinnovations.africa/fullchain.pem:/certs/fullchain.pem:ro
       - /etc/letsencrypt/live/ictinnovations.africa/privkey.pem:/certs/privkey.pem:ro
     ports:
-      - '8001:8000'
+      - '8000:8000'
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - web
