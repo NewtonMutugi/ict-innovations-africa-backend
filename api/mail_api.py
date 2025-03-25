@@ -31,6 +31,7 @@ class MailApi:
             raise HTTPException(
                 status_code=500, detail="Failed to send email") from e
 
+    # TODO: Finish implementing this method
     async def send_payment_confirmation(self, formData):
         email = formData['email']
         amount = formData['amount']

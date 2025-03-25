@@ -74,6 +74,7 @@ async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
             status_code=500, detail="Failed to process the request"
         )
 
+# TODO: Method implementation incomplete
 @router.post("/hosting-payment-confirmed")
 async def hosting_payment_confirmed(request: Request):
     try:
