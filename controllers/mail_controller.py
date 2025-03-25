@@ -73,3 +73,23 @@ async def webgenerator_email(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=500, detail="Failed to process the request"
         )
+
+@router.post("/hosting-payment-confirmed")
+async def hosting_payment_confirmed(request: Request):
+    try:
+        # Parse request JSON into a Pydantic model
+        form_data = await request.json()
+        logging.info(f"Received payment confirmation: {form_data}")
+
+        # Send a confirmation email
+        await mail_api.send_payment_confirmation(form_data)
+
+        return {"message": "Payment confirmation email sent successfully"}
+    except ValidationError as ve:
+        logging.error(f"Validation error: {ve}")
+        raise HTTPException(status_code=422, detail="Invalid form data")
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        raise HTTPException(
+            status_code=500, detail="Failed to process the request"
+        )

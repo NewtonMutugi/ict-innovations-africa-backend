@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     SMTP_PORT: int
     AUTH_SECRET_KEY: str
     CALLBACK_URL: str
+    NOREPLY_EMAIL: str
+    NOREPLY_PASSWORD: str
+    ICT_SMTP_SERVER: str
 
     class Config:
         env_file = './.env'
